@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The_lyon_arg</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Añadido: Font Awesome para el ícono "+" -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>Menú</h2>
+    <button onclick="showSection('audioSection')">Sonidos</button>
+    <button onclick="showSection('imageSection')">Imágenes</button>
+    <button onclick="showSection('videoSection')">Videos</button>
+  </div>
+
+  <!-- Contenido Principal -->
+  <div class="content">
+    <div class="header-container">
+      <h1><img src="img/logo.png" alt="Logo"></h1>
+      
+      <!-- Nuevo botón de subir archivos estilo YouTube -->
+      <div class="upload-button" onclick="showSection('uploadSection')">
+        <i class="fas fa-plus"></i>
+        <span>Subir</span>
+      </div>
+    </div>
+
+    <!-- Buscador de archivos -->
+    <div class="search-box">
+      <label for="searchInput">Buscar archivos</label>
+      <input type="text" id="searchInput" oninput="filterFiles()" placeholder="Escribí para filtrar..." />
+    </div>
+
+    <!-- Formulario para subir archivos (ahora como modal) -->
+    <section id="uploadSection" class="file-section upload-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Subir archivo</h2>
+          <button class="close-modal" onclick="closeUploadModal()">&times;</button>
+        </div>
+        <div class="upload-box">
+          <form id="uploadForm" enctype="multipart/form-data">
+            <div class="file-upload-area" onclick="document.getElementById('fileInput').click()">
+              <span>Arrastra un archivo aquí o haz clic para seleccionarlo</span>
+              <input type="file" id="fileInput" name="file" required onchange="previewFile()" />
+            </div>
+
+            <!-- Opciones de formato y escala (solo si es una imagen) -->
+            <div id="fileOptions" class="file-options" style="display:none;">
+              <div>
+                <label for="newName">Nuevo nombre:</label>
+                <input type="text" id="newName" name="newName" placeholder="Nuevo nombre (opcional)" />
+              </div>
+              
+              <div>
+                <label for="imageScale">Escala:</label>
+                <select id="imageScale" name="scale">
+                  <option value="original">Original</option>
+                  <option value="small">Pequeño</option>
+                  <option value="medium">Mediano</option>
+                  <option value="large">Grande</option>
+                </select>
+              </div>
+
+              <div id="formatOptions">
+                <label for="imageFormat">Formato:</label>
+                <select id="imageFormat" name="format">
+                  <option value="jpg">JPG</option>
+                  <option value="png">PNG</option>
+                  <option value="gif">GIF</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="filePreview">
+              <!-- Aquí se mostrará una vista previa si el archivo tiene imagen, audio o video -->
+            </div>
+
+            <button type="submit">Subir archivo</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Secciones de archivos -->
+    <section id="audioSection" class="file-section active">
+      <h2>🔊 Sonidos</h2>
+      <div id="audioContainer" class="file-container"></div>
+    </section>
+
+    <section id="imageSection" class="file-section">
+      <h2>🖼️ Imágenes</h2>
+      <div id="imageContainer" class="file-container"></div>
+    </section>
+
+    <section id="videoSection" class="file-section">
+      <h2>🎬 Videos</h2>
+      <div id="videoContainer" class="file-container"></div>
+    </section>
+  </div>
+
+  <script>
+    // Función para mostrar y ocultar secciones del menú
+    function showSection(id) {
+      if (id === 'uploadSection') {
+        document.getElementById(id).style.display = 'flex';
+      } else {
+        document.querySelectorAll('.file-section:not(#uploadSection)').forEach(section => {
+          section.classList.remove('active');
+        });
+        document.getElementById(id).classList.add('active');
+
+        document.querySelectorAll('.sidebar button').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        const buttons = {
+          audioSection: 0,
+          imageSection: 1,
+          videoSection: 2
+        };
+        document.querySelectorAll('.sidebar button')[buttons[id]].classList.add('active');
+      }
+    }
+
+    // Cerrar el modal de subida
+    function closeUploadModal() {
+      document.getElementById('uploadSection').style.display = 'none';
+    }
+
+    // Función para previsualizar el archivo antes de subirlo
+    function previewFile() {
+      const file = document.getElementById('fileInput').files[0];
+      const previewContainer = document.getElementById('filePreview');
+      const optionsContainer = document.getElementById('fileOptions');
+      previewContainer.innerHTML = ''; // Limpiar cualquier vista previa anterior
+      optionsContainer.style.display = 'none';
+
+      if (file) {
+        const fileType = file.type.split('/')[0];
+
+        // Si es una imagen
+        if (fileType === 'image') {
+          const img = document.createElement('img');
+          img.src = URL.createObjectURL(file);
+          img.alt = file.name;
+          previewContainer.appendChild(img);
+
+          // Mostrar opciones solo si es una imagen
+          optionsContainer.style.display = 'grid';
+        }
+        // Si es un video
+        else if (fileType === 'video') {
+          const video = document.createElement('video');
+          video.controls = true;
+          video.src = URL.createObjectURL(file);
+          previewContainer.appendChild(video);
+        }
+        // Si es audio
+        else if (fileType === 'audio') {
+          const audio = document.createElement('audio');
+          audio.controls = true;
+          audio.src = URL.createObjectURL(file);
+          previewContainer.appendChild(audio);
+        }
+      }
+    }
+
+    // Subir el archivo y enviar los datos
+    const form = document.getElementById('uploadForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+
+      // Enviar el archivo con el nuevo nombre y opciones seleccionadas
+      const response = await fetch('/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        alert('Archivo subido correctamente');
+        closeUploadModal();
+      } else {
+        alert('Hubo un error al subir el archivo');
+      }
+
+      form.reset();
+      document.getElementById('filePreview').innerHTML = '';
+      document.getElementById('fileOptions').style.display = 'none';
+      loadFiles(); // Recargar los archivos después de subir
+    });
+
+    // Función para cargar los archivos
+    async function loadFiles() {
+      try {
+        const res = await fetch('/files');
+        const currentFiles = await res.json();
+        renderFiles(currentFiles);
+      } catch (error) {
+        console.error("Error cargando archivos:", error);
+      }
+    }
+
+    // Filtrar archivos por búsqueda
+    function filterFiles() {
+      loadFiles();
+    }
+
+    // Renderizar los archivos en sus secciones correspondientes
+    function renderFiles(files) {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+      const containers = {
+        audio: document.getElementById('audioContainer'),
+        image: document.getElementById('imageContainer'),
+        video: document.getElementById('videoContainer')
+      };
+
+      for (const type in containers) {
+        containers[type].innerHTML = '';
+        
+        if (!files[type] || !Array.isArray(files[type])) {
+          containers[type].innerHTML = '<p>No hay archivos disponibles</p>';
+          continue;
+        }
+        
+        let filteredFiles = files[type].filter(file => 
+          file.toLowerCase().includes(searchTerm)
+        );
+        
+        if (filteredFiles.length === 0) {
+          containers[type].innerHTML = '<p>No se encontraron resultados</p>';
+          continue;
+        }
+
+        filteredFiles.forEach(file => {
+          const div = document.createElement('div');
+          div.className = 'file-card';
+
+          if (type === 'audio') {
+            div.innerHTML = `
+              <audio controls src="uploads/${file}"></audio>
+              <input type="text" value="${file}" onchange="renameFile('${file}', this.value)" />
+            `;
+          } else if (type === 'image') {
+            div.innerHTML = `
+              <img src="uploads/${file}" alt="${file}">
+              <input type="text" value="${file}" onchange="renameFile('${file}', this.value)" />
+            `;
+          } else if (type === 'video') {
+            div.innerHTML = `
+              <video controls src="uploads/${file}"></video>
+              <input type="text" value="${file}" onchange="renameFile('${file}', this.value)" />
+            `;
+          }
+
+          containers[type].appendChild(div);
+        });
+      }
+    }
+
+    // Función para cambiar el nombre de los archivos
+    function renameFile(oldName, newName) {
+      if (oldName === newName || newName.trim() === '') return;
+
+      fetch('/rename', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ oldName, newName })
+      }).then(res => {
+        if (res.ok) {
+          alert("Nombre cambiado");
+          loadFiles();
+        } else {
+          alert("Error al renombrar");
+        }
+      });
+    }
+
+    // Cierra el modal si se hace clic fuera de su contenido
+    window.onclick = function(event) {
+      const modal = document.getElementById('uploadSection');
+      if (event.target === modal) {
+        modal.style.display = "none";
+      }
+    }
+
+    // Iniciar la aplicación
+    document.addEventListener('DOMContentLoaded', function() {
+      loadFiles();
+      // Activar el primer botón por defecto
+      document.querySelectorAll('.sidebar button')[0].classList.add('active');
+    });
+  </script>
+
+</body>
+</html>
