@@ -7,8 +7,85 @@
   <link rel="stylesheet" href="style.css" />
   <!-- Añadido: Font Awesome para el ícono "+" -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <style>
+    /* Estilos para la barra lateral */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -250px; /* Oculta la barra lateral inicialmente */
+      width: 250px;
+      height: 100%;
+      background-color: #333;
+      color: white;
+      padding: 20px;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+      transition: left 0.3s ease;
+    }
+
+    .sidebar.open {
+      left: 0; /* Muestra la barra lateral */
+    }
+
+    .sidebar h2 {
+      margin-top: 0;
+    }
+
+    .sidebar button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      background-color: #444;
+      color: white;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .sidebar button.active {
+      background-color: #555;
+    }
+
+    /* Botón de hamburguesa */
+    .hamburger {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: #333;
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    .hamburger i {
+      font-size: 20px;
+    }
+
+    /* Estilos para la pantalla de inicio */
+    .start-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #f4f4f4;
+      text-align: center;
+    }
+
+    .start-logo {
+      width: 150px;
+      height: auto;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
+    <!-- Botón de hamburguesa -->
+  <button class="hamburger" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
 
   <!-- Sidebar -->
   <div class="sidebar">
@@ -21,8 +98,9 @@
   <!-- Contenido Principal -->
   <div class="content">
     <div class="header-container">
-      <h1><img src="img/logo.png" alt="Logo"></h1>
-      
+      <h1>
+        <!-- Eliminada la imagen del logo -->
+      </h1>
       <!-- Nuevo botón de subir archivos estilo YouTube -->
       <div class="upload-button" onclick="showSection('uploadSection')">
         <i class="fas fa-plus"></i>
@@ -105,6 +183,20 @@
   </div>
 
   <script>
+    // Función para iniciar la aplicación
+    function startApp() {
+      document.getElementById('startScreen').style.display = 'none';
+      document.querySelector('.hamburger').style.display = 'block';
+      document.querySelector('.sidebar').style.display = 'block';
+      document.querySelector('.content').style.display = 'block';
+    }
+
+    // Función para abrir/cerrar la barra lateral
+    function toggleSidebar() {
+      const sidebar = document.querySelector('.sidebar');
+      sidebar.classList.toggle('open');
+    }
+
     // Función para mostrar y ocultar secciones del menú
     function showSection(id) {
       if (id === 'uploadSection') {

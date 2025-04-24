@@ -396,56 +396,56 @@ body {
   background-color: var(--hover-color);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .sidebar {
-    width: 70px;
-    padding: 1.5rem 0.5rem;
-  }
-  
-  .sidebar h2 {
-    font-size: 0;
-    margin-bottom: 1.5rem;
-  }
-  
-  .sidebar h2:before {
-    content: "≡";
-    font-size: 1.5rem;
-    display: block;
-    text-align: center;
-  }
-  
-  .sidebar button {
-    padding: 0.8rem;
-    text-align: center;
-    font-size: 0;
-  }
-  
-  .sidebar button:before {
-    content: none;
-  }
-  
-  .sidebar button:nth-child(1):after {
-    content: "🔊";
-  }
-  
-  .sidebar button:nth-child(2):after {
-    content: "🖼️";
-  }
-  
-  .sidebar button:nth-child(3):after {
-    content: "🎬";
-  }
-  
-  .sidebar button:after {
-    font-size: 1.2rem;
-  }
-  
-  .content {
-    margin-left: 70px;
-  }
-  
-  .modal-content {
-    width: 95%;
-  }
+/* Estilos para la barra lateral oculta */
+.sidebar {
+  left: -240px; /* Oculta la barra lateral inicialmente */
+  transition: left 0.3s ease;
+}
+
+/* Clase para mostrar la barra lateral */
+.sidebar.open {
+  left: 0; /* Muestra la barra lateral */
+}
+
+/* Ajuste del contenido principal cuando la barra lateral está abierta */
+.content {
+  margin-left: 0; /* Por defecto */
+  transition: margin-left 0.3s ease;
+}
+
+.sidebar.open ~ .content {
+  margin-left: 240px; /* Ajusta el margen cuando la barra lateral está abierta */
+}
+
+/* Estilos para el botón de hamburguesa */
+.hamburger {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  z-index: 101; /* Asegura que esté por encima de la barra lateral */
+  box-shadow: var(--box-shadow);
+  transition: var(--transition);
+}
+
+.hamburger:hover {
+  background-color: var(--hover-color);
+}
+
+.hamburger i {
+  font-size: 1.5rem;
+}
+
+/* Eliminar estilos de la pantalla de inicio */
+.start-screen {
+  display: none;
+}
+
+.start-logo {
+  display: none;
 }
